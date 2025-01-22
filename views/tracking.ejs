@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStreetMap Example</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+     
+
+        <script>
+            // Khởi tạo bản đồ
+            var map = L.map('map').setView([16.152933, 106.133791], 6);
+    
+            // Thêm tile layer từ OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+    
+            // Lưu trữ các marker
+            const markers = new Map();
+    
+            // Hàm cập nhật marker từ API
+            const updateMarkers = (data) => {
+                const existingDeviceNames = new Set();
+    
+                // Duyệt qua dữ liệu mới
+                data.forEach(element => {
+                    const { deviceName, lat, lng } = element;
+                    existingDeviceNames.add(deviceName);
+    
+                    if (markers.has(deviceName)) {
+                        // Marker đã tồn tại, kiểm tra nếu cần cập nhật
+                        const marker = markers.get(deviceName);
+                        const currentLatLng = marker.getLatLng();
+    
+                        if (currentLatLng.lat !== lat || currentLatLng.lng !== lng) {
+                            marker.setLatLng([lat, lng]); // Cập nhật vị trí
+                            marker.setPopupContent(deviceName); // Cập nhật popup nếu cần
+                        }
+                    } else {
+                        // Thêm marker mới
+                        const marker = L.marker([lat, lng]).bindPopup(deviceName);
+                        marker.addTo(map);
+                        markers.set(deviceName, marker);
+                    }
+                });
+    
+                // Xóa các marker không còn trong dữ liệu mới
+                markers.forEach((marker, deviceName) => {
+                    if (!existingDeviceNames.has(deviceName)) {
+                        map.removeLayer(marker);
+                        markers.delete(deviceName);
+                    }
+                });
+            };
+    
+            // Request API mỗi 1 giây
+            setInterval(() => {
+                fetch('http://localhost:3000') // API trả về danh sách marker
+                    .then(res => res.json())
+                    .then(data => {
+                        updateMarkers(data);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }, 3000);
+        </script>
+</body>
+
+</html>

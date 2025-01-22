@@ -28,6 +28,7 @@ app.set('view engine', 'ejs');
 
 app.post('/', (req, res) => {
     const { deviceName, latitude, longitude } = req.body;
+    console.log(req.body);
     if(!deviceName || !latitude || !longitude) {
         return res.status(400).json({ message: 'Thiếu thông tin' })
     }

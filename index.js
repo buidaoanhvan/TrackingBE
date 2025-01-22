@@ -60,6 +60,12 @@ app.get('/tracking', (req, res) => {
     res.render('tracking')
 })
 
+app.get('/tracking/del', (req, res) => {
+    // xóa tất cả dữ liệu trong bảng
+    db.run('DELETE FROM locations');
+    res.status(200).json({ message: 'ok' })
+})
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })

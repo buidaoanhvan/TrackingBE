@@ -2,6 +2,7 @@ const express = require('express')
 const sqlite3 = require('sqlite3');
 const app = express()
 const port = 3000
+const bodyParser = require('body-parser')
 
 // Kết nối đến cơ sở dữ liệu SQLite
 const db = new sqlite3.Database('db.sqlite', (err) => {
@@ -22,7 +23,7 @@ db.run(
     )`
 );
 
-app.use(express.json())
+app.use(bodyParser.json({ type: 'application/*+json' }))
 app.set('view engine', 'ejs');
 
 app.post('/', (req, res) => {

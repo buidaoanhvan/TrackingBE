@@ -1,2 +1,3 @@
 # bỏ node modules
 node_modules/
+db.sqlite

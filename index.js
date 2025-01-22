@@ -28,6 +28,9 @@ app.set('view engine', 'ejs');
 
 app.post('/', (req, res) => {
     const { deviceName, latitude, longitude } = req.body;
+    if(!deviceName || !latitude || !longitude) {
+        return res.status(400).json({ message: 'Thiếu thông tin' })
+    }
     db.get('SELECT * FROM locations WHERE deviceName = ?', [deviceName], (err, row) => {
         if (!row) {
             const stmt = db.prepare('INSERT INTO locations (deviceName, lat, lng) VALUES (?, ?, ?)');

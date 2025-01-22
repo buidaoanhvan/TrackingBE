@@ -67,7 +67,7 @@
         };
         // Request API mỗi 1 giây
         setInterval(() => {
-            fetch('http://localhost:3000') // API trả về danh sách marker
+            fetch('http://103.82.133.92:3000') // API trả về danh sách marker
                 .then(res => res.json())
                 .then(data => {
                     updateMarkers(data);
